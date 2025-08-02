@@ -1,0 +1,1 @@
+sudo --preserve-env=VIRTUAL_ENV,PATH python main.py
