@@ -62,7 +62,7 @@ def main():
         if choice == '1':
             from modules.led import initialize_strip, startup_test
             import board
-            strip = initialize_strip(num_pixels=72, pin=board.D2, brightness=200)
+            strip = initialize_strip(num_pixels=72, pin=board.D12, brightness=200)
             startup_test(strip, wait=0.02)
             print("NeoPixel startup test completed.")
 

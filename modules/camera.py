@@ -46,11 +46,13 @@ class CameraTester:
             logger.error(f'Camera {camera_index} could not be opened.')
             return False, None
         ret, frame = cap.read()
+        rotated_frame = cv2.rotate(frame, cv2.ROTATE_180)
+        del frame
         cap.release()
-        if not ret or frame is None:
+        if not ret or rotated_frame is None:
             logger.error(f'Failed to read frame from camera {camera_index}.')
             return False, None
-        return True, frame
+        return True, rotated_frame
 
     def test_camera(self, camera_index: int, save_path: str = None) -> bool:
         '''

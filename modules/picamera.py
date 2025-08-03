@@ -55,9 +55,11 @@ def test_picamera(output_path: str = "./snapshots/picamera2.jpg") -> bool:
     except Exception as e:
         print(f"❌ Failed to capture image: {e}")
         camera.stop()
+        camera.close()
         return False
 
     camera.stop()
+    camera.close()
 
     if os.path.isfile(output_path):
         print(f"✅ Image saved to {output_path}")
