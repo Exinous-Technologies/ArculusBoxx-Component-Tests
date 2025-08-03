@@ -1,4 +1,4 @@
-**ArculusBoxx Component Test Suite**
+# **ArculusBoxx Component Test Suite**
 
 A comprehensive test harness for the ArculusBoxx embedded system, covering camera and I²C interfaces. This suite ensures that the hardware interfaces are correctly configured and that the Python-based test runner executes reliably in a controlled environment.
 
