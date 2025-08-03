@@ -25,7 +25,7 @@ A comprehensive test harness for the ArculusBoxx embedded system, covering camer
 
 ## Initial Setup
 
-Before creating the Python virtual environment, complete the following steps to enable the required hardware interfaces and install system dependencies.
+Before creating the Python virtual environment, complete the following steps to enable the required hardware interfaces, install system dependencies, and configure optional UPS HAT (D) battery monitoring.
 
 ### 1. Enable Interfaces
 
@@ -52,6 +52,23 @@ sudo apt install -y libcamera-dev libcamera-apps libcap-dev
 ```
 
 These packages provide access to the Raspberry Pi camera subsystem and allow privilege elevations for camera apps.
+
+### 3. UPS HAT (D) Battery Level Display Setup
+
+If you're using the Waveshare UPS HAT (D) for battery monitoring, follow these steps to enable the battery level display:
+
+```bash
+sudo apt-get install p7zip
+wget https://files.waveshare.com/wiki/UPS-HAT-D/UPS_HAT_D.7z
+7zr x UPS_HAT_D.7z -r -o./
+cd UPS_HAT_D
+./main.sh   #Do not add 'sudo'
+sudo reboot
+```
+
+After rebooting, you should see a battery icon in the upper right corner of your desktop. This indicates that the UPS HAT (D) battery monitoring is working correctly. The battery icon will display information about battery capacity, voltage, and remaining charge when you hover over it.
+
+**Note:** If the battery level drops below 5%, a low battery warning will appear, and the system will automatically power off after 60 seconds if no charging power is connected.
 
 ---
 
