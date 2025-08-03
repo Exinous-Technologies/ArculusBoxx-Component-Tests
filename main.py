@@ -122,7 +122,7 @@ def main():
 
         elif choice == '5':
             from modules.pir_sensor import PIRSensorTest
-            sensor = PIRSensorTest(pin=17, calibration_delay=2.0)
+            sensor = PIRSensorTest(pin=17, calibration_delay=10.0)
             try:
                 if sensor.detect_motion(timeout=15):
                     print("✅ PIR sensor test passed.")
