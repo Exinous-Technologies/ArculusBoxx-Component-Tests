@@ -79,7 +79,7 @@ def _raw_read(hx):
     raise AttributeError('No supported raw read method on HX711 object')
 
 
-def read_weight(hx, readings=5):
+def read_weight(hx, readings=20):
     """
     Read an averaged weight measurement (in grams) from the provided HX711 instance,
     applying zero_offset and reference_unit.
@@ -89,23 +89,34 @@ def read_weight(hx, readings=5):
     :return: Weight in grams (float)
     """
     # Read raw counts, preferring bulk average if available
-    if hasattr(hx, 'read_average'):
-        try:
-            raw = hx.read_average(readings)
-        except Exception:
-            raw = sum(_raw_read(hx) for _ in range(readings)) / readings
-    else:
-        values = []
-        for _ in range(readings):
-            if hasattr(hx, 'read'):
-                val = hx.read(1)
-            else:
-                val = _raw_read(hx)
-            values.append(val)
-        raw = sum(values) / len(values)
+    # if hasattr(hx, 'read_average'):
+    #     try:
+    #         raw = hx.read_average(readings)
+    #     except Exception:
+    #         raw = sum(_raw_read(hx) for _ in range(readings)) / readings
+    # else:
+    #     values = []
+    #     for _ in range(readings):
+    #         if hasattr(hx, 'read'):
+    #             val = hx.read(1)
+    #         else:
+    #             val = _raw_read(hx)
+    #         values.append(val)
+    #     raw = sum(values) / len(values)
+
+    values = []
+    for _ in range(readings):
+        if hasattr(hx, 'read'):
+            val = hx.read(1)
+        else:
+            val = _raw_read(hx)
+        values.append(val)
+        print(val)
+    raw = sum(values) / len(values)
 
     # Apply offset and calibration factor
     weight = (raw - hx.zero_offset) / hx.reference_unit
+
 
     # Power cycle to save energy if supported
     if hasattr(hx, 'power_down'):
@@ -132,6 +143,7 @@ def prompt_and_read(config=None, readings=5):
     :return: Weight reading in grams
     """
     hx = setup_scale(config)
+    print(read_weight(hx, readings))
     input("Press Enter when a weight has been placed on the platform...")
     weight = read_weight(hx, readings)
     cleanup()

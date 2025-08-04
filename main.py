@@ -72,8 +72,8 @@ def main():
                 config={
                     'dout_pin': 5,
                     'pd_sck_pin': 6,
-                    'reference_unit': -16.56,
-                    'zero_offset': 477428.75
+                    'reference_unit': -237.63,
+                    'zero_offset': 2230937.88
                 },
                 readings=30
             )
