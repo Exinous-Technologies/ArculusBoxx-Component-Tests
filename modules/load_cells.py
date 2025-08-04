@@ -11,7 +11,7 @@ import time
 import RPi.GPIO as GPIO
 from hx711 import HX711
 
-__version__ = "1.4"
+__version__ = "1.5"
 
 # Default HX711 configuration: BCM pin numbers, calibration factor, and zero offset
 DEFAULT_CONFIG = {
@@ -70,13 +70,32 @@ def setup_scale(config=None):
     return hx
 
 
-def _raw_read(hx):
+def read_raw(hx, readings=10):
     """
-    Fallback raw read for HX711 variants.
+    Read raw values from HX711 with multiple fallback methods for different library variants.
+    
+    :param hx: HX711 instance
+    :param readings: Number of samples to average
+    :return: Average raw count value
     """
-    if hasattr(hx, '_read'):
-        return hx._read()
-    raise AttributeError('No supported raw read method on HX711 object')
+    values = []
+    for _ in range(readings):
+        if hasattr(hx, 'get_value'):
+            val = hx.get_value(1)
+        elif hasattr(hx, 'get_weight'):
+            val = hx.get_weight(1)
+        elif hasattr(hx, 'get_units'):
+            val = hx.get_units(1)
+        elif hasattr(hx, 'read_average'):
+            val = hx.read_average(1)
+        elif hasattr(hx, 'read'):
+            val = hx.read(1)
+        elif hasattr(hx, '_read'):
+            val = hx._read()
+        else:
+            raise AttributeError('No supported read method on HX711')
+        values.append(val)
+    return sum(values) / len(values)
 
 
 def read_weight(hx, readings=20):
@@ -88,35 +107,11 @@ def read_weight(hx, readings=20):
     :param readings: Number of raw samples to average
     :return: Weight in grams (float)
     """
-    # Read raw counts, preferring bulk average if available
-    # if hasattr(hx, 'read_average'):
-    #     try:
-    #         raw = hx.read_average(readings)
-    #     except Exception:
-    #         raw = sum(_raw_read(hx) for _ in range(readings)) / readings
-    # else:
-    #     values = []
-    #     for _ in range(readings):
-    #         if hasattr(hx, 'read'):
-    #             val = hx.read(1)
-    #         else:
-    #             val = _raw_read(hx)
-    #         values.append(val)
-    #     raw = sum(values) / len(values)
-
-    values = []
-    for _ in range(readings):
-        if hasattr(hx, 'read'):
-            val = hx.read(1)
-        else:
-            val = _raw_read(hx)
-        values.append(val)
-        print(val)
-    raw = sum(values) / len(values)
+    # Read raw counts using the robust method from calibration script
+    raw = read_raw(hx, readings)
 
     # Apply offset and calibration factor
     weight = (raw - hx.zero_offset) / hx.reference_unit
-
 
     # Power cycle to save energy if supported
     if hasattr(hx, 'power_down'):
@@ -143,7 +138,6 @@ def prompt_and_read(config=None, readings=5):
     :return: Weight reading in grams
     """
     hx = setup_scale(config)
-    print(read_weight(hx, readings))
     input("Press Enter when a weight has been placed on the platform...")
     weight = read_weight(hx, readings)
     cleanup()
